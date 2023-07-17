@@ -1,0 +1,733 @@
+import java.util.*;
+public class Example {
+
+    public static Scanner input=new Scanner (System.in);
+    public static Random r=new Random ();
+    public static String userName="1";
+    public static String Storedpassword="1";
+    public static String[][] suppliers= new String[2][100];
+    public static int suppliersCount=0;
+    public static int supliersIDIndex=0;
+    public static int suppliersNameIndex=0;
+    public static String supplierID;
+    public static String supplierName;
+	public static String[][] items = new String[100][6];
+    public static int[][] storeSupplierArrIndex = new int[2][100];
+    public static int[][] storeCategoryArrIndex = new int[2][100];
+    public static int itemCount = 0;
+
+
+    private final static void clearConsole() {
+
+        final String os = System.getProperty("os.name");
+        try {
+            if (os.equals("Linux")) {
+                System.out.print("\033\143");
+            } else if (os.equals("Windows")) {
+                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+            } else {
+                System.out.print("\033[H\033[2J");
+                System.out.flush();
+            }
+        } catch (final Exception e) {
+            //handle the exception
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public static void backToHome() {
+        System.out.print("Do you want to go to the home page? (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")||response.equals("y")){
+            clearConsole();
+            StockMangement();
+        }else if(response.equals("N")||response.equals("n")){
+            clearConsole();
+            CreatelogInPage();
+        }
+    }
+
+	public static void CreatelogInPage(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                LOGIN PAGE                                  |");
+        System.out.println("+----------------------------------------------------------------------------+");
+
+            boolean isUserNameCorrect = false;
+            boolean isUserPasswordCorrect = false;
+
+            while (!isUserNameCorrect){
+                System.out.print("Enter UserName : ");
+                String name = input.nextLine();
+                if(userName.equals(name)){
+                    isUserNameCorrect = true;
+                    while(!isUserPasswordCorrect){
+                        System.out.print("Enter Password : ");
+                        String password = input.nextLine();
+                        if(Storedpassword.equals(password)){
+                            isUserPasswordCorrect = true;
+                            StockMangement();
+                        }else{
+                            System.out.println("password is incorrect. Please try again!");
+                        }
+                    }
+                }else{
+                    System.out.println("Invalid username! Please try again.");
+                }
+            }
+        clearConsole();
+	}
+    public static void StockMangement(){
+
+		clearConsole();
+		
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                 Welcome To IJSE Stock management System                    |");
+        System.out.println("+----------------------------------------------------------------------------+");
+
+        System.out.println("[1] change the Credentials \t\t [2] Supplier Manage");
+        System.out.println("[3] Stock Manage \t\t\t [4] LogOut");
+        System.out.println("[5] Exit the System ");
+
+
+        System.out.println("\n\n");
+        System.out.print("Enter an option to continue  >");
+        int m=input.nextInt();
+        input.nextLine();
+        clearConsole();
+        switch(m){
+            case 1:
+
+                changePassword();
+                break;
+            case 2:
+                SupplierManage();
+                break;
+            case 3:
+
+                StockManage();
+                break;
+            case 4:
+                clearConsole();
+                CreatelogInPage();
+                backToHome();
+                break;
+            case 5:
+                System.out.println("Exit the System option selected.");
+                break;
+            default:
+                System.out.println("Invalid option. Please try again.");
+                break;
+        }
+    }
+
+    public static void changePassword(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                             CREDENTIAL MANAGE                              |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println();
+        boolean isUserNameCorrect = false;
+        boolean isUserPasswordCorrect = false;
+
+        while (!isUserNameCorrect){
+            System.out.print("Enter UserName : ");
+            String name = input.nextLine();
+            if(userName.equals(name)){
+                isUserNameCorrect = true;
+                while(!isUserPasswordCorrect){
+                    System.out.print("Enter Current Password : ");
+                    String password = input.nextLine();
+                    if(Storedpassword.equals(password)){
+                        System.out.print("Enter your new password  :");
+                        String newPassword=input.nextLine();
+                        isUserPasswordCorrect = true;
+                        Storedpassword=newPassword;
+                        System.out.println("Password changed successfully! ");
+                        backToHome();
+                        clearConsole();
+                    }else{
+                        System.out.println("password is incorrect. Please try again!");
+                    }
+                }
+            }else{
+                System.out.println("Invalid username! Please try again.");
+            }
+        }
+
+
+    }
+    public static void SupplierManage(){
+		System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                               SUPPLIER MANAGE                              |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("[1] Add Supplier \t\t [2] Update Supplier");
+        System.out.println("[3] Delete Supplier \t\t [4] View Suppliers");
+        System.out.println("[5] Search Supplier \t\t [6] HomePage");
+        System.out.println("\n\n");
+        System.out.print("Enter an option to continue  :");
+        int s=input.nextInt();
+        input.nextLine();
+        clearConsole();
+        switch(s){
+            case 1:
+
+                AddSupplier();
+                break;
+            case 2:
+
+                updateSupplier();
+                break;
+            case 3:
+
+                deleteSupplier();
+                break;
+            case 4:
+                viewSupplier();
+                break;
+            case 5:
+
+                searchSupplier();
+                break;
+            case 6:
+                StockMangement();
+                break;
+
+            case 7:
+                System.out.println("Invalid option. Please try again.");
+                break;
+        }
+    }
+     public static void AddSupplier(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                  ADD SUPPLIER                              |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean isIDDuplicate = true;
+        while (isIDDuplicate){
+            System.out.print("Supplier ID  :");
+            supplierID=input.nextLine();
+            for(int i=0;i<=suppliersCount;i++){
+                String supID = suppliers[0][i];
+                if(supplierID.equals(supID)){
+                    System.out.println("Supplier ID already Exist. Add another,");
+                    isIDDuplicate = true;
+                    break;
+                }else {
+                    isIDDuplicate=false;
+                }
+            }
+        }
+        System.out.print("Supplier Name  :");
+        supplierName=input.nextLine();
+        suppliers[0][supliersIDIndex] = supplierID;
+        suppliers[1][suppliersNameIndex] = supplierName;
+        supliersIDIndex++;
+        suppliersNameIndex++;
+        suppliersCount++;
+        System.out.print("Added Succsesfuly !  ");
+        System.out.println();
+        addAnotherSupplier();
+		clearConsole();
+    }
+    
+     public static void addAnotherSupplier(){
+
+        System.out.print("Do you want to add new Supplier (Y/N) ?  :");
+        char add = input.next().charAt(0);
+
+        input.nextLine();
+
+        if(add=='Y'|add=='y'){
+			clearConsole();
+            AddSupplier();
+            
+        }if(add=='N'|add=='n'){
+			clearConsole();
+            SupplierManage();
+        } else {
+            System.out.println("invalid option !");
+        }
+    }
+    
+    public static void updateSupplier(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                  UPDATE SUPPLIER                           |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println();
+        boolean isPresent = false;
+        while(!isPresent){
+            System.out.print("Enter SupplierID : ");
+            supplierID=input.nextLine();
+            for(int i=0;i<=suppliersCount;i++){
+                String supID = suppliers[0][i];
+                if(supplierID.equals(supID)){
+                    System.out.println("Supplier Name : "+ suppliers[1][i]);
+                    System.out.print("Enter the new Supplier name :");
+                    suppliers[1][i]= input.nextLine();
+                    System.out.println("Update Successfully!");
+                    System.out.println();
+                    updateAnother();
+                }
+            }
+            System.out.println("can't find supplier id. try again");
+        }
+    }
+    public static void updateAnother(){
+        System.out.print("Do You want to update another supplier (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            updateSupplier();
+        } else if (response.equals("N")) {
+			clearConsole();
+            SupplierManage();
+        } else {
+            System.out.println("worng input");
+            updateAnother();
+        }
+    }
+    
+    public static void deleteSupplier(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                  DELETE SUPPLIER                           |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean isPresent = false;
+        while(!isPresent){
+            System.out.print("Enter SupplierID : ");
+            supplierID=input.nextLine();
+            for(int i=0;i<=suppliersCount;i++){
+                String supID = suppliers[0][i];
+                if(supplierID.equals(supID)){
+                    suppliers[0][i]= " ";
+                    suppliers[1][i]= " ";
+                    System.out.println("Delete Successfully!");
+                    deleteAnother();
+                }
+            }
+            System.out.println("can't find supplier id. try again");
+        }
+
+    }
+    
+    public static void deleteAnother(){
+        System.out.print("Do You want to delete another supplier (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            deleteSupplier();
+        }else if (response.equals("N")) {
+			clearConsole();
+            SupplierManage();
+        } else {
+            System.out.println("worng input");
+            deleteAnother();
+        }
+    }
+    public static void viewSupplier(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                  VIEW SUPPLIERS                            |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("+-----------+--------------------+");
+        System.out.printf("| %11s | %20s |\n", "SUPPLIER ID" , "SUPPLIER NAME" );
+        System.out.println("+-----------+--------------------+");
+        for (int i=0; i<suppliersCount;i++){
+            if(!suppliers[0][i].equals(" ")){
+                System.out.printf("| %11s | %20s |\n", suppliers[0][i] , suppliers[1][i] );
+            }
+        }
+        System.out.println("Do You want to do supplier manage page (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")) {
+			clearConsole();
+            SupplierManage();
+        }
+        else if (response.equals("N")) {
+			clearConsole();
+            StockMangement();
+        } else {
+            clearConsole();
+            System.out.println("worng input");
+            viewSupplier();
+        }
+    }
+    
+    public static void searchSupplier(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                                  SEARCH SUPPLIER                           |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean isPresent = false;
+        while(!isPresent){
+            System.out.print("Enter SupplierID : ");
+            supplierID=input.nextLine();
+            for(int i=0;i<=suppliersCount;i++){
+                String supID = suppliers[0][i];
+                if(supplierID.equals(supID)){
+                    System.out.println("Supplier Id : "+ suppliers[0][i]);
+                    System.out.println("Supplier Name : "+ suppliers[1][i]);
+                    System.out.println();
+                    serarchAnother();
+                }
+            }
+            System.out.println("can't find supplier id. try again");
+        }
+    }
+    
+    public static void serarchAnother(){
+
+        System.out.print("Do You want to serarch another supplier (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            searchSupplier();
+        }else {
+			clearConsole();
+            SupplierManage();
+        }
+    }
+    
+   
+    public static void StockManage() {
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                             STOCK MANAGME                                  |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("[1] Manage Item categories \t\t [2] Add Item");
+        System.out.println("[3] Get Item Supplier Wise \t\t [4] View Items");
+        System.out.println("[5] Rank Items Per Unit Price \t\t [6] HomePage");
+
+        System.out.println("\n\n");
+
+        System.out.print("Enter an option to continue  :");
+        int F = input.nextInt();
+        input.nextLine();
+
+        clearConsole();
+
+        switch (F) {
+
+            case 1:
+                ManageItemCategories();
+                break;
+            case 2:
+                addItem();
+                break;
+            case 3:
+                getItemsSupplierVise();
+                break;
+            case 4:
+                viewItems();
+                break;
+            case 5:
+                itemsPriceVice();
+                break;
+            case 6:
+                StockMangement();
+                break;
+
+        }
+    }
+    public static void  ManageItemCategories(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                      Manage Item categories                                |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("[1] Add New Item Category \t\t [2] Delete Item Category");
+        System.out.println("[3] Update Item Category  \t\t [4] Stock Management");
+        System.out.println("\n\n");
+        System.out.print("Enter an option to continue(Only numbers):");
+        int H = input.nextInt();
+        input.nextLine();
+        if(H==1 ||H==2 ||H==3 ||H==4){
+            clearConsole();
+            switch (H) {
+                case 1:
+                    AddNewItemCategory();
+                    break;
+                case 2:
+                    deleteItemCategory();
+                    break;
+                case 3:
+                    updateCategory();
+                    break;
+                case 4:
+                    StockManage();
+                    break;
+            }
+        }else {
+            System.out.println("Wrong input!!!!!");
+            ManageItemCategories();
+        }
+    }
+    public static String[] categories = new String[100];
+    public static int categoryCount = 0;
+    public static void AddNewItemCategory(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                              Add New Item Category                         |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean addAnother = true;
+        while(addAnother){
+            System.out.print("Enter the new item category :");
+            String itemCategory = input.nextLine();
+            categories[categoryCount]= itemCategory;
+            categoryCount++;
+            addAnotherCategory();
+        }
+
+    }
+    public static void addAnotherCategory(){
+        System.out.println("Do You want to add new category (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            AddNewItemCategory();
+        }else {
+			clearConsole();
+            StockManage();
+        }
+    }
+
+    public static void deleteItemCategory(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                               Delete Item Category                         |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean isCategoryPresent = true;
+        while (isCategoryPresent){
+            System.out.println("Enter Item Category : ");
+            String category = input.nextLine();
+            for(int i=0;i<categoryCount;i++){
+                if(category.equals(categories[i])){
+                    categories[i]=" ";
+                    System.out.println("Category Deleted...");
+                    deleteAnotherCategory();
+                }
+            }
+            System.out.println("No Category there like "+ category);
+        }
+    }
+    public static void deleteAnotherCategory(){
+        System.out.println("Do You want to delete another category (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            deleteItemCategory();
+        }else {
+			clearConsole();
+            ManageItemCategories();
+        }
+    }
+
+    
+    public static void updateCategory(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                               Update Item Category                         |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        boolean isCategoryPresent = true;
+        while (isCategoryPresent){
+            System.out.print("Enter Item Category : ");
+            String category = input.nextLine();
+            for(int i=0;i<categoryCount;i++){
+                if(category.equals(categories[i])){
+                    System.out.println("Enter New Name for this Item Category : ");
+                    categories[i]=input.nextLine();
+                    System.out.println("Category Updated...");
+                    updateAnotherCategory();
+                }
+            }
+            System.out.println("No Category there like "+ category);
+        }
+    }
+    public static void updateAnotherCategory(){
+        System.out.println("Do You want to update another category (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            updateCategory();
+        }else {
+			clearConsole();
+            ManageItemCategories();
+        }
+    }
+    public static void addItem(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                           ADD ITEM                                         |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        if(categoryCount == 0){
+            System.out.println("OOPS! It seems that you don't have any item categories in the system");
+            addAnotherCategory();
+        } else if (suppliersCount == 0) {
+            System.out.println("OOPS! It seems that you don't have any suppliers in the system");
+            addAnotherSupplier();
+        }else{
+            System.out.print("Item Code : ");
+            String itemCode = input.nextLine();
+            items[itemCount][0] =itemCode;
+            System.out.println();
+            System.out.println("Supplier List :");
+            System.out.println("+-----------------+-------------------------------+-------------------------+");
+            System.out.println("|        #        |           SUPPLIER ID         |      SUPPLIER NAME      |");
+            System.out.println("+-----------------+-------------------------------+-------------------------+");
+            int f = 0;
+            int n = 1;
+            for(int i =0;i<suppliersCount;i++) {
+                storeSupplierArrIndex[0][i] = i;
+
+                if(!suppliers[0][i].equals(" ")){
+                    storeSupplierArrIndex[1][f++] = i;
+                    System.out.printf("| %15s | %27s | %25s |\n", n++, suppliers[0][i], suppliers[1][i]);
+                }
+            }
+            System.out.println();
+            System.out.print("Enter the supplier number > ");
+            int supplierNumber = input.nextInt();
+            input.nextLine();
+            items[itemCount][5] = suppliers[0][storeSupplierArrIndex[1][supplierNumber-1]];
+            System.out.println();
+            System.out.println("Item Categories:");
+            System.out.println("+-----------------+-------------------------------+");
+            System.out.println("|        #        |           CATEGORY NAME       |");
+            System.out.println("+-----------------+-------------------------------+");
+            int j=0;
+            int m = 1;
+            for(int i=0;i<categoryCount;i++){
+                storeCategoryArrIndex[0][i]= i;
+                if(!categories[i].equals(" ")){
+                    storeCategoryArrIndex[1][j] = i;
+                    System.out.printf("| %15s | %27s |\n", m++  , categories[i] );
+                    j++;
+                }
+            }
+            System.out.println();
+            System.out.print("Enter the category number > ");
+            int categoryNumber = input.nextInt();
+            input.nextLine();
+            items[itemCount][4] = categories[storeCategoryArrIndex[1][categoryNumber-1]];
+            System.out.println();
+            System.out.print("Enter the Description : ");
+            String description = input.nextLine();
+            items[itemCount][1] =description;
+            System.out.print("\nEnter the Unit Price (format:000.0): ");
+            String unitPrice = input.nextLine();
+            items[itemCount][2] =unitPrice;
+            System.out.print("\nEnter the Qty on hand : ");
+            String qty = input.nextLine();
+            items[itemCount][3] =qty;
+            itemCount++;
+            addAnotherItem();
+        }
+    }
+    public static void addAnotherItem(){
+        System.out.println("Do You want to add another Item (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            addItem();
+        }else {
+			clearConsole();
+            StockManage();
+        }
+    }
+    public static void viewItems(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                           VIEW ITEM                                        |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        for(int i =0 ;i<categoryCount;i++){
+            if(!categories[i].equals(" ")){
+                String cat = categories[i];
+                System.out.println(cat+":");
+                System.out.println("+-----------+--------------+-----------+--------------+-----------+");
+                System.out.println("|    SID    |    CODE      |    DESC   |    PRICE     |    QTY    |");
+                System.out.println("+-----------+--------------+-----------+--------------+-----------+");
+                System.out.println();
+                for(int j=0;j<itemCount;j++){
+                    if(items[j][4].equals(cat)){
+                        System.out.printf("| %12s | %15s | %15s | %15s | %15s |\n",items[j][5], items[j][0], items[j][1], items[j][2], items[j][3]  );
+                    }
+                }
+            }
+        }
+        System.out.print("Do You want to go to homepage (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            ManageItemCategories();
+        }else {
+			clearConsole();
+            StockManage();
+        }
+    }
+
+    public static void getItemsSupplierVise(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                      GET ITEM SUPPLIER WISE                                |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        
+        boolean isPresent = true;
+        while (isPresent){
+            System.out.print("Enter Supplier Id:");
+            String supID = input.nextLine();
+
+            for(int i=0;i<suppliersCount;i++){
+                if(supID.equals(suppliers[0][i])){
+                    System.out.println("Suppler ID :"+ suppliers[1][i]);
+                    System.out.println();
+                    System.out.println("+-----------+--------------+-----------+--------------+-----------+");
+                    System.out.println("| ITEM CODE | DESCRIPTION  |UNIT PRICE |  QTY ON HAND |  CATEGORY |");
+                    System.out.println("+-----------+--------------+-----------+--------------+-----------+");
+                    for(int j=0;j<itemCount;j++){
+                        if(items[j][5].equals(suppliers[1][i])){
+                            System.out.printf("| %12s | %15s | %15s | %15s | %15s |\n",items[j][0], items[j][1], items[j][2], items[j][3], items[j][4]);
+                        }
+                    }
+                    searchAnotherSuppliers();
+                }
+            }
+            System.out.println("This supplier is not in system.");
+        }
+    }
+    public static void searchAnotherSuppliers(){
+        System.out.println("Do You want to serach another Supplier (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            getItemsSupplierVise();
+        }else {
+			clearConsole();
+            StockManage();
+        }
+    }
+
+    public static void itemsPriceVice(){
+        System.out.println("+----------------------------------------------------------------------------+");
+        System.out.println("|                      RANK ITEMS PER UNIT PRICE                             |");
+        System.out.println("+----------------------------------------------------------------------------+");
+        
+        
+        double[] sortArr = new double[itemCount];  // Assuming 'itemCount' is the number of items
+        for (int i = 0; i < itemCount; i++) {
+            sortArr[i] = Double.parseDouble(items[i][2]);
+        }
+        Arrays.sort(sortArr);
+        System.out.println();
+        System.out.println("+-----------+-----------+--------------+-----------+--------------+-----------+");
+        System.out.println("|   SID     |   CODE    |      DESC    |   PRICE   |      QTY     |    CAT    |");
+        System.out.println("+-----------+-----------+--------------+-----------+--------------+-----------+");
+        for (double sortedValue : sortArr) {
+            String s = String.valueOf(sortedValue);
+            for (int j = 0; j < itemCount; j++) {
+                if (items[j][2].equals(s)) {
+                    System.out.printf("| %12s | %12s | %15s | %15s | %15s | %15s |\n", items[j][5], items[j][0], items[j][1], items[j][2], items[j][3], items[j][4]);
+                }
+            }
+        }
+        System.out.println("Do You want to go to homepage (Y/N)?");
+        String response = input.nextLine();
+        if(response.equals("Y")){
+			clearConsole();
+            StockManage();
+        }else {
+			clearConsole();
+            StockMangement();
+        }
+    }
+    public static void main (String args[]){
+        CreatelogInPage();
+    }
+
+}
+
